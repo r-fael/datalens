@@ -1,0 +1,27 @@
+# Override APENAS para a VPS que ja roda Traefik (Swarm).
+# Publica o frontend do DataLens pelo Traefik existente, com TLS Let's Encrypt,
+# sem alterar o docker-compose.yml versionado nem a rede rafaelnet das outras apps.
+#
+# Uso na VPS:
+#   docker compose -f docker-compose.yml -f deploy/docker-compose.traefik.yml up -d
+#
+# Pre-requisitos (feitos uma vez, ver deploy/traefik-setup.md):
+#   - rede overlay attachable "datalens-proxy" criada
+#   - servico traefik_traefik conectado a essa rede
+#   - DNS do subdominio apontando para a VPS
+services:
+  frontend:
+    networks:
+      - default          # fala com a API interna do compose
+      - datalens-proxy   # visivel para o Traefik
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: datalens-proxy
+      traefik.http.routers.datalens.rule: "Host(`datalens.r-fael.com.br`)"
+      traefik.http.routers.datalens.entrypoints: websecure
+      traefik.http.routers.datalens.tls.certresolver: letsencryptresolver
+      traefik.http.services.datalens.loadbalancer.server.port: "80"
+
+networks:
+  datalens-proxy:
+    external: true

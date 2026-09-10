@@ -64,4 +64,3 @@ resina/
 # Scripts de depuracao pontual e anexos de teste (nao versionar).
 # As planilhas .xlsb aqui pesavam ~44MB e estouravam o limite de push do GitLab.
 scratch/
-deploy/
